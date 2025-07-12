@@ -1,5 +1,7 @@
 name: build-test
-
+permissions:
+  contents: read
+  pull-requests: write
 on:
   push:
     branches: [ dev, main ]
