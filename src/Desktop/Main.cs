@@ -35,7 +35,8 @@ namespace AmoebaSim.Desktop
         private bool drawViewField = true;
         private bool drawSmellField = true;
 
-        private Timer plantTimer;
+        private const double PlantGrowIntervalSeconds = 30.0;
+        private double _plantGrowAccumulator = 0.0;
 
         public Main()
         {
@@ -50,14 +51,6 @@ namespace AmoebaSim.Desktop
             organisms = new List<Organism>();
             plants = new List<Plant>();
 
-            plantTimer = new Timer(30000);
-            plantTimer.Elapsed += new ElapsedEventHandler(plantTimer_Elapsed);
-            plantTimer.Enabled = true;
-        }
-
-        void plantTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Grow(Rand.Next(25,50));
         }
 
         protected override void Initialize()
@@ -217,6 +210,15 @@ namespace AmoebaSim.Desktop
             organisms.RemoveAll(Organism.IsNotAlive);
             organisms.AddRange(newOrganisms);
             plants.RemoveAll(Plant.IsEaten);
+
+            _plantGrowAccumulator += gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (_plantGrowAccumulator >= PlantGrowIntervalSeconds)
+            {
+                Grow(NUM_PLANTS_PER_GROW);
+                _plantGrowAccumulator = 0.0;
+            }
+
 
             base.Update(gameTime);
         }
