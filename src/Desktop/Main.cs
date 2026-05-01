@@ -19,7 +19,7 @@ namespace AmoebaSim.Desktop
         public static Random Rand = new Random((int)DateTime.Now.Ticks);
 
         private static int NUM_INITIAL_ORGANISMS = 3;
-        private static int NUM_PLANTS_PER_GROW = 100;
+        private static int NUM_PLANTS_PER_GROW = 25;
 
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -35,7 +35,7 @@ namespace AmoebaSim.Desktop
         private bool drawViewField = true;
         private bool drawSmellField = true;
 
-        private const double PlantGrowIntervalSeconds = 30.0;
+        private const double PlantGrowIntervalSeconds = 60.0;
         private double _plantGrowAccumulator = 0.0;
 
         public Main()
