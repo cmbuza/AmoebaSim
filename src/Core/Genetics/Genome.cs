@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 
-namespace AmoebaSim.Desktop
+namespace AmoebaSim.Core.Genetics
 {
     public class Genome<T> where T : IGene, new()
     {

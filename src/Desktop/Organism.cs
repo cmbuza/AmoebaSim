@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using System.Timers;
+using AmoebaSim.Core.Genetics;
 
 namespace AmoebaSim.Desktop
 {
