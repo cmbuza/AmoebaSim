@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AmoebaSim.Desktop
+namespace AmoebaSim.Core.Genetics
 {
     public class IntegerGene : IGene
     {
