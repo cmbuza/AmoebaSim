@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
+using AmoebaSim.Core.Primitives;
 
-namespace AmoebaSim.Desktop
+namespace AmoebaSim.Core.Organisms
 {
     public class Plant
     {
@@ -21,6 +21,7 @@ namespace AmoebaSim.Desktop
         }
 
         private int size;
+        private static int DEFAULT_RADIUS = 10;
         public int Radius
         {
             get { return size; }
@@ -34,15 +35,18 @@ namespace AmoebaSim.Desktop
             set { isEaten = value; }
         }
 
-        public Plant()
+        public Plant(int x, int y, int rad)
         {
-            int x = Main.Rand.Next(Main.BACKBUFFER_WIDTH);
-            int y = Main.Rand.Next(Main.BACKBUFFER_HEIGHT);
-            loc = new Point(x,y);
+            loc = new Point(x, y);
 
-            size = Main.Rand.Next(5, 30);
+            size = rad;
 
             isEaten = false;
         }
+
+        public Plant() : this(0, 0, DEFAULT_RADIUS) {}
+
+        public Plant(int x, int y) : this(x, y, DEFAULT_RADIUS) {}
+
     }
 }

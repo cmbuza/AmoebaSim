@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AmoebaSim.Core.Primitives;
+using AmoebaSim.Core.Organisms;
+using AmoebaSim.Core.Simulation;
 
 namespace AmoebaSim.Desktop
 {
@@ -14,8 +17,6 @@ namespace AmoebaSim.Desktop
     {
         public static int BACKBUFFER_WIDTH = 1200;
         public static int BACKBUFFER_HEIGHT = 900;
-
-        public static Random Rand = new Random((int)DateTime.Now.Ticks);
 
         private static int NUM_INITIAL_ORGANISMS = 3;
         private static int NUM_PLANTS_PER_GROW = 25;
@@ -29,8 +30,8 @@ namespace AmoebaSim.Desktop
         private Color[] backBuffer;
         private Texture2D backBufferTex;
 
-        private List<Organism> organisms;
-        private List<Plant> plants;
+        private List<Amoeba> organisms;
+        private List<Core.Organisms.Plant> plants;
         private bool drawViewField = true;
         private bool drawSmellField = true;
 
@@ -47,7 +48,7 @@ namespace AmoebaSim.Desktop
             IsFixedTimeStep = true;
             TargetElapsedTime = new TimeSpan(200000);
 
-            organisms = new List<Organism>();
+            organisms = new List<Amoeba>();
             plants = new List<Plant>();
 
         }
@@ -85,15 +86,15 @@ namespace AmoebaSim.Desktop
             for (int i = 0; i < NUM_INITIAL_ORGANISMS; i++)
             {
                 organisms.Add(
-                    new Organism(
-                        Rand.Next(gfxConfig.BackBufferWidth),
-                        Rand.Next(gfxConfig.BackBufferHeight),
-                        Rand.Next(10, 50),
+                    new Amoeba(
+                        Random.Shared.Next(gfxConfig.BackBufferWidth),
+                        Random.Shared.Next(gfxConfig.BackBufferHeight),
+                        Random.Shared.Next(10, 50),
                         1,
-                        Rand.Next(20, 100),
-                        Rand.Next(1, 5),
-                        Rand.Next(2, 7),
-                        Rand.Next(30, 100)));
+                        Random.Shared.Next(20, 100),
+                        Random.Shared.Next(1, 5),
+                        Random.Shared.Next(2, 7),
+                        Random.Shared.Next(30, 100)));
                 //organisms.Add(
                 //        new Organism(
                 //            Rand.Next(gfxConfig.BackBufferWidth),
@@ -105,7 +106,7 @@ namespace AmoebaSim.Desktop
                 //            3));
             }
 
-            Grow(NUM_PLANTS_PER_GROW);
+            Grow(NUM_PLANTS_PER_GROW, context);
 
             Console.WriteLine("New Sim began at " + DateTime.Now.TimeOfDay);
         }
@@ -119,6 +120,7 @@ namespace AmoebaSim.Desktop
             }
         }
 
+        private AmoebaSimContext context = new AmoebaSimContext();
 
         double fpsTimer = 0;
         int frames = 0;
@@ -148,20 +150,20 @@ namespace AmoebaSim.Desktop
 
             int iwp = 0, iwo = 0;
 
-            List<Organism> newOrganisms = new List<Organism>();
+            List<Amoeba> newOrganisms = new List<Amoeba>();
 
-            foreach (Organism o in organisms)
+            foreach (Amoeba o in organisms)
             {
                 try
                 {
 
                     if (o.IsAlive)
                     {
-                        o.Update();
+                        o.Update(gameTime.ElapsedGameTime.TotalSeconds, context);
 
                         if (o.IsInHeat)
                         {
-                            foreach (Organism org in organisms)
+                            foreach (Amoeba org in organisms)
                             {
                                 if (!org.IsAlive) continue;
                                 if (org == o) continue;
@@ -171,7 +173,7 @@ namespace AmoebaSim.Desktop
                                 if (iwo == 0) continue;
 
                                 if (iwo == 1)
-                                    o.Target = new Point(org.X, org.Y);
+                                    o.Target = new Core.Primitives.Point(org.X, org.Y);
                                 else
                                 {
                                     o.PlantsEaten = 0;
@@ -206,7 +208,7 @@ namespace AmoebaSim.Desktop
                 }
             }
 
-            organisms.RemoveAll(Organism.IsNotAlive);
+            organisms.RemoveAll(Amoeba.IsNotAlive);
             organisms.AddRange(newOrganisms);
             plants.RemoveAll(Plant.IsEaten);
 
@@ -214,7 +216,7 @@ namespace AmoebaSim.Desktop
 
             if (_plantGrowAccumulator >= PlantGrowIntervalSeconds)
             {
-                Grow(NUM_PLANTS_PER_GROW);
+                Grow(NUM_PLANTS_PER_GROW, context);
                 _plantGrowAccumulator = 0.0;
             }
 
@@ -246,7 +248,7 @@ namespace AmoebaSim.Desktop
                 System.Diagnostics.Debug.WriteLine(ioe);
             }
 
-            foreach (Organism o in organisms)
+            foreach (Amoeba o in organisms)
             {
                 if (!o.IsAlive) continue;
 
@@ -297,10 +299,15 @@ namespace AmoebaSim.Desktop
             base.Draw(gameTime);
         }
 
-        private void Grow(int numToGrow)
+        private void Grow(int numToGrow, AmoebaSimContext context)
         {
             for (int i = 0; i < numToGrow; i++)
-                plants.Add(new Plant());
+                plants.Add( new Plant(
+                        context.Random.Next(context.WorldWidth),
+                        context.Random.Next(context.WorldHeight),
+                        context.Random.Next(5, 30)
+                        )
+                    );
         }
     }
 }

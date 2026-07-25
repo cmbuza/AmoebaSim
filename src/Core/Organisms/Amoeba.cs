@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
 using System.Timers;
+using System.Numerics;
 using AmoebaSim.Core.Genetics;
+using AmoebaSim.Core.Primitives;
+using AmoebaSim.Core.Simulation;
 
-namespace AmoebaSim.Desktop
+namespace AmoebaSim.Core.Organisms
 {
     public enum Attributes
     {
@@ -18,11 +20,11 @@ namespace AmoebaSim.Desktop
         SMELLDIST = 5
     }
 
-    public class Organism
+    public class Amoeba
     {
         private static int MUTATION_PROBABILITY = 10; //read chances as 1 in MUTATION_PROBABILITY
 
-        public static bool IsNotAlive(Organism o)
+        public static bool IsNotAlive(Amoeba o)
         {
             return !o.IsAlive;
         }
@@ -33,7 +35,7 @@ namespace AmoebaSim.Desktop
         private Point targ;
         private bool bAlive;
 
-        private Timer lifeTimer, switchDirTimer;
+        //private Timer lifeTimer, switchDirTimer;
 
         public int X
         {
@@ -102,16 +104,14 @@ namespace AmoebaSim.Desktop
             {
                 targ = value;
                 direction = new Vector2(targ.X - x, targ.Y - y);
-                direction.Normalize();
-
-                switchDirTimer.Stop();
-                switchDirTimer.Start();
+                direction = Vector2.Normalize(direction);
             }
         }
 
         public bool IsAlive
         {
             get { return bAlive; }
+            set {  bAlive = value; }
         }
 
         public bool IsInHeat
@@ -119,7 +119,7 @@ namespace AmoebaSim.Desktop
             get { return PlantsEaten >= FoodNeededToReproduce; }
         }
 
-        public Organism()
+        public Amoeba()
         {
             genome = new Genome<IntegerGene>(Enum.GetNames(typeof(Attributes)).Length);
 
@@ -162,19 +162,9 @@ namespace AmoebaSim.Desktop
             plantCount = 0;
 
             bAlive = true;
-
-            lifeTimer = new Timer(60000);
-            lifeTimer.Elapsed += new ElapsedEventHandler(lifeTimer_Elapsed);
-            lifeTimer.Enabled = true;
-
-            switchDirTimer = new Timer(Main.Rand.Next(5000,15000));
-            switchDirTimer.Elapsed += new ElapsedEventHandler(switchDirTimer_Elapsed);
-            switchDirTimer.Enabled = true;
-
-            switchDirTimer_Elapsed(this, null);
         }
 
-        public Organism(int xVal, int yVal, int radius)
+        public Amoeba(int xVal, int yVal, int radius)
             : this()
         {
             x = xVal;
@@ -182,7 +172,7 @@ namespace AmoebaSim.Desktop
             R = radius;
         }
 
-        public Organism(int xVal, int yVal, int radius, int speed, int viewDist, int numOffspring, int foodToReproduce, int smellDist)
+        public Amoeba(int xVal, int yVal, int radius, int speed, int viewDist, int numOffspring, int foodToReproduce, int smellDist)
             : this(xVal, yVal, radius)
         {
             Speed = speed;
@@ -192,7 +182,7 @@ namespace AmoebaSim.Desktop
             SmellDistance = smellDist;
         }
 
-        public Organism(Organism o)
+        public Amoeba(Amoeba o)
             : this()
         {
             genome = new Genome<IntegerGene>(o.genome);
@@ -205,30 +195,41 @@ namespace AmoebaSim.Desktop
             return genome.ToString();
         }
 
-        private void lifeTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            bAlive = false;
-        }
-
-        void switchDirTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            targ.X = Main.Rand.Next(Main.BACKBUFFER_WIDTH);
-            targ.Y = Main.Rand.Next(Main.BACKBUFFER_HEIGHT);
-
-            direction = new Vector2(targ.X - x, targ.Y - y);
-
-            direction.Normalize();
-        }
-
-        public void Update()
+        public void Move(AmoebaSimContext context)
         {
             x += (int)Math.Round(Speed * direction.X);
-            if (x > Main.BACKBUFFER_WIDTH || x < 0)
+            if (x > context.WorldWidth || x < 0)
                 direction.X = -direction.X;
 
             y += (int)Math.Round(Speed * direction.Y);
-            if (y > Main.BACKBUFFER_HEIGHT || y < 0)
+            if (y > context.WorldHeight || y < 0)
                 direction.Y = -direction.Y;
+        }
+
+        private double ageSeconds = 0, lifeSpanSeconds = 60;
+        private double directionTimerSeconds;
+        private double nextDirectionChangeSeconds;
+
+        public void Update(double deltaSeconds, AmoebaSimContext context)
+        {
+            ageSeconds += deltaSeconds;
+
+            if (ageSeconds >= lifeSpanSeconds)
+            {
+                IsAlive = false;
+                return;
+            }
+
+            directionTimerSeconds += deltaSeconds;
+            if (directionTimerSeconds >= nextDirectionChangeSeconds)
+            {
+                Target = new Point(context.Random.Next(context.WorldWidth),
+                    context.Random.Next(context.WorldHeight));
+                directionTimerSeconds = 0;
+                nextDirectionChangeSeconds = context.Random.Next(5, 15);
+            }
+
+            Move(context);
         }
 
         public int InteractsWithPlant(Plant p)
@@ -257,7 +258,7 @@ namespace AmoebaSim.Desktop
             return ret;
         }
 
-        public int InteractsWithOrganism(Organism o)
+        public int InteractsWithOrganism(Amoeba o)
         {
             Vector2 vec = new Vector2(x - o.X, y - o.Y);
 
@@ -283,12 +284,12 @@ namespace AmoebaSim.Desktop
             return ret;
         }
 
-        public List<Organism> Reproduce()
+        public List<Amoeba> Reproduce()
         {
-            List<Organism> children = new List<Organism>();
+            List<Amoeba> children = new List<Amoeba>();
             for (int i = 0; i < NumberOfOffspring; i++)
             {
-                Organism o = new Organism(this);
+                Amoeba o = new Amoeba(this);
                 o.genome.MutateAll(MUTATION_PROBABILITY);
                 children.Add(o);
             }
@@ -296,15 +297,15 @@ namespace AmoebaSim.Desktop
             return children;
         }
 
-        public List<Organism> Reproduce(Organism o)
+        public List<Amoeba> Reproduce(Amoeba o)
         {
             Genome<IntegerGene> newGenome = genome.Crossover(o.genome);
-            List<Organism> children = new List<Organism>();
+            List<Amoeba> children = new List<Amoeba>();
             int numOffspring = (int)newGenome.Genes[(int)Attributes.NUMOFFSPRING].Value;
 
             for (int i = 0; i < numOffspring; i++)
             {
-                Organism norg = new Organism(this);
+                Amoeba norg = new Amoeba(this);
                 norg.genome = genome.Crossover(o.genome);
                 norg.genome.MutateAll(MUTATION_PROBABILITY);
                 children.Add(norg);
