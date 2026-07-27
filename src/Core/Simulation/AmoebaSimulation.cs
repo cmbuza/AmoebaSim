@@ -4,11 +4,11 @@ using System.Text;
 
 namespace AmoebaSim.Core.Simulation
 {
-    public class AmoebaSim
+    public class AmoebaSimulation
     {
         private AmoebaSimConfig simConfig; 
         private AmoebaSimContext simContext;
-        public AmoebaSim()
+        public AmoebaSimulation()
         { 
             simConfig = new AmoebaSimConfig();
             simContext = new AmoebaSimContext();
