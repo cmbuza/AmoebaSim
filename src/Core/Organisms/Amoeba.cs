@@ -195,7 +195,7 @@ namespace AmoebaSim.Core.Organisms
             return genome.ToString();
         }
 
-        public void Move(AmoebaSimContext context)
+        internal void Move(AmoebaSimContext context)
         {
             x += (int)Math.Round(Speed * direction.X);
             if (x > context.WorldWidth || x < 0)
@@ -210,7 +210,7 @@ namespace AmoebaSim.Core.Organisms
         private double directionTimerSeconds;
         private double nextDirectionChangeSeconds;
 
-        public void Update(double deltaSeconds, AmoebaSimContext context)
+        internal void Update(double deltaSeconds, AmoebaSimContext context)
         {
             ageSeconds += deltaSeconds;
 

@@ -4,22 +4,23 @@ using System.Text;
 
 namespace AmoebaSim.Core.Simulation
 {
-    public class AmoebaSimContext
+    internal sealed class AmoebaSimContext
     {
-        private readonly Random rand;
-        public Random Random { get { return rand; } }
-
-        private int worldWidth, worldHeight;
-        public int WorldWidth { get { return worldWidth; } internal set { worldWidth = value; } }
-        public int WorldHeight { get { return worldHeight; } internal set { worldHeight = value; } }
-
-        public AmoebaSimContext()
+        internal AmoebaSimContext(AmoebaSimConfig config)
         {
-            rand = Random.Shared;
-            // rand = new Random((int)DateTime.Now.Ticks);
-            // rand = new Random(0);
-            worldWidth = 1200;
-            worldHeight = 900;
+            Config = config;
+
+            Random = config.RandomSeed is int seed
+                ? new Random(seed)
+                : new Random();
         }
+
+        internal AmoebaSimConfig Config { get; }
+
+        internal Random Random { get; }
+
+        internal int WorldWidth => Config.WorldWidth;
+
+        internal int WorldHeight => Config.WorldHeight;
     }
 }
