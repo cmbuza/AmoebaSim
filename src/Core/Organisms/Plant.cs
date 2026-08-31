@@ -6,7 +6,7 @@ using AmoebaSim.Core.Primitives;
 
 namespace AmoebaSim.Core.Organisms
 {
-    public class Plant
+    public sealed class Plant : ISpatialEntity
     {
         public static bool IsEaten(Plant p)
         {
@@ -20,6 +20,19 @@ namespace AmoebaSim.Core.Organisms
             set { loc = value; }
         }
 
+        private bool isEaten;
+        public bool Eaten
+        {
+            get { return isEaten; }
+            set { isEaten = value; }
+        }
+
+        #region ISpatialEntity
+
+        public EntityId Id => throw new NotImplementedException();
+
+        public Point Position => Location;
+
         private int size;
         private static int DEFAULT_RADIUS = 10;
         public int Radius
@@ -28,12 +41,9 @@ namespace AmoebaSim.Core.Organisms
             set { size = value; }
         }
 
-        private bool isEaten;
-        public bool Eaten
-        {
-            get { return isEaten; }
-            set { isEaten = value; }
-        }
+        public SpatialEntityKind Kind => SpatialEntityKind.Plant;
+
+        #endregion
 
         public Plant(int x, int y, int rad)
         {

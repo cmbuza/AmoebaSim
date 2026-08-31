@@ -20,7 +20,7 @@ namespace AmoebaSim.Core.Organisms
         SMELLDIST = 5
     }
 
-    public class Amoeba
+    public sealed class Amoeba : ISpatialEntity
     {
         public static bool IsNotAlive(Amoeba o)
         {
@@ -28,24 +28,17 @@ namespace AmoebaSim.Core.Organisms
         }
 
         private Genome<IntegerGene> genome;
-        private int x, y, plantCount;
+        private int plantCount;
         private Vector2 direction;
         private Point targ;
+        private Point loc;
         private bool bAlive;
 
         //private Timer lifeTimer, switchDirTimer;
 
-        public int X
-        {
-            get { return x; }
-            set { x = value; }
-        }
+        public int X => loc.X;
 
-        public int Y
-        {
-            get { return y; }
-            set { y = value; }
-        }
+        public int Y => loc.Y;
 
         public int R
         {
@@ -101,7 +94,7 @@ namespace AmoebaSim.Core.Organisms
             set
             {
                 targ = value;
-                direction = new Vector2(targ.X - x, targ.Y - y);
+                direction = new Vector2(targ.X - X, targ.Y - Y);
                 direction = Vector2.Normalize(direction);
             }
         }
@@ -117,6 +110,17 @@ namespace AmoebaSim.Core.Organisms
             get { return PlantsEaten >= FoodNeededToReproduce; }
         }
 
+        #region ISpatialEntity
+
+        public EntityId Id => throw new NotImplementedException();
+
+        public Point Position => loc;
+
+        public int Radius => R;
+
+        public SpatialEntityKind Kind => SpatialEntityKind.Amoeba;
+
+        #endregion
         public Amoeba()
         {
             genome = new Genome<IntegerGene>(Enum.GetNames(typeof(Attributes)).Length);
@@ -153,8 +157,7 @@ namespace AmoebaSim.Core.Organisms
             genome.Genes[5].Step = 5;
             #endregion
 
-            x = 0;
-            y = 0;
+            loc = new Point(0, 0);
             R = 1;
 
             plantCount = 0;
@@ -165,8 +168,7 @@ namespace AmoebaSim.Core.Organisms
         public Amoeba(int xVal, int yVal, int radius)
             : this()
         {
-            x = xVal;
-            y = yVal;
+            loc = new Point(xVal, yVal);
             R = radius;
         }
 
@@ -184,8 +186,7 @@ namespace AmoebaSim.Core.Organisms
             : this()
         {
             genome = new Genome<IntegerGene>(o.genome);
-            x = o.x;
-            y = o.y;
+            loc = new Point(o.X, o.Y);
         }
 
         public override string ToString()
@@ -195,12 +196,12 @@ namespace AmoebaSim.Core.Organisms
 
         internal void Move(AmoebaSimContext context)
         {
-            x += (int)Math.Round(Speed * direction.X);
-            if (x > context.WorldWidth || x < 0)
+            loc.X += (int)Math.Round(Speed * direction.X);
+            if (X > context.WorldWidth || X < 0)
                 direction.X = -direction.X;
 
-            y += (int)Math.Round(Speed * direction.Y);
-            if (y > context.WorldHeight || y < 0)
+            loc.Y += (int)Math.Round(Speed * direction.Y);
+            if (Y > context.WorldHeight || Y < 0)
                 direction.Y = -direction.Y;
         }
 
@@ -232,7 +233,7 @@ namespace AmoebaSim.Core.Organisms
 
         internal int InteractsWithPlant(Plant p, AmoebaSimContext context)
         {
-            Vector2 vec = new Vector2(x - p.Location.X, y - p.Location.Y);
+            Vector2 vec = new Vector2(X - p.Location.X, Y - p.Location.Y);
 
             int ret = 0; //0 means no interaction
 
@@ -258,7 +259,7 @@ namespace AmoebaSim.Core.Organisms
 
         internal int InteractsWithOrganism(Amoeba o, AmoebaSimContext context)
         {
-            Vector2 vec = new Vector2(x - o.X, y - o.Y);
+            Vector2 vec = new Vector2(X - o.X, Y - o.Y);
 
             int ret = 0; //0 means no interaction
 

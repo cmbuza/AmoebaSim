@@ -13,6 +13,7 @@ namespace AmoebaSim.Core.Simulation
         private readonly AmoebaSimContext _context;
         private readonly List<Amoeba> _amoebas = [];
         private readonly List<Plant> _plants = [];
+        //private readonly SpatialHash<ISpatialEntity> _spatialIndex = [];
 
         public AmoebaSimConfig Config { get; }
 
