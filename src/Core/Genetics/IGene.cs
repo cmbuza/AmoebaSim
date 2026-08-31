@@ -15,6 +15,6 @@ namespace AmoebaSim.Core.Genetics
 
         object Step { get; set; }
 
-        void Mutate();
+        void Mutate(Random r);
     }
 }

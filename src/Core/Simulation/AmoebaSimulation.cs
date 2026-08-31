@@ -101,7 +101,7 @@ namespace AmoebaSim.Core.Simulation
                                 if (org == o) continue;
                                 if (!org.IsInHeat) continue;
 
-                                iwo = o.InteractsWithOrganism(org);
+                                iwo = o.InteractsWithOrganism(org, _context);
                                 if (iwo == 0) continue;
 
                                 if (iwo == 1)
@@ -110,7 +110,7 @@ namespace AmoebaSim.Core.Simulation
                                 {
                                     o.PlantsEaten = 0;
                                     org.PlantsEaten = 0;
-                                    newOrganisms.AddRange(o.Reproduce(org));
+                                    newOrganisms.AddRange(o.Reproduce(org, _context));
                                 }
                             }
                         }
@@ -120,7 +120,7 @@ namespace AmoebaSim.Core.Simulation
                             {
                                 if (p.Eaten) continue;
 
-                                iwp = o.InteractsWithPlant(p);
+                                iwp = o.InteractsWithPlant(p, _context);
                                 if (iwp == 0) continue;
 
                                 if (iwp == 1)

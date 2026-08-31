@@ -26,6 +26,9 @@ namespace AmoebaSim.Core.Simulation
         // Null means generate a nondeterministic seed.
         public int? RandomSeed { get; init; }
 
+        //read chances as 1 in MutationProbability
+        public int MutationProbability { get; init; } = 10; 
+
         internal void Validate()
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(WorldWidth);

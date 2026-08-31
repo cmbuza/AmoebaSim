@@ -22,8 +22,6 @@ namespace AmoebaSim.Core.Organisms
 
     public class Amoeba
     {
-        private static int MUTATION_PROBABILITY = 10; //read chances as 1 in MUTATION_PROBABILITY
-
         public static bool IsNotAlive(Amoeba o)
         {
             return !o.IsAlive;
@@ -206,7 +204,7 @@ namespace AmoebaSim.Core.Organisms
                 direction.Y = -direction.Y;
         }
 
-        private double ageSeconds = 0, lifeSpanSeconds = 60;
+        private double ageSeconds = 0;
         private double directionTimerSeconds;
         private double nextDirectionChangeSeconds;
 
@@ -214,7 +212,7 @@ namespace AmoebaSim.Core.Organisms
         {
             ageSeconds += deltaSeconds;
 
-            if (ageSeconds >= lifeSpanSeconds)
+            if (ageSeconds >= context.Config.AmoebaLifeSpan.TotalSeconds)
             {
                 IsAlive = false;
                 return;
@@ -232,7 +230,7 @@ namespace AmoebaSim.Core.Organisms
             Move(context);
         }
 
-        public int InteractsWithPlant(Plant p)
+        internal int InteractsWithPlant(Plant p, AmoebaSimContext context)
         {
             Vector2 vec = new Vector2(x - p.Location.X, y - p.Location.Y);
 
@@ -241,7 +239,7 @@ namespace AmoebaSim.Core.Organisms
             if (vec.Length() > ViewDistance + p.Radius
                 && vec.Length() <= SmellDistance + p.Radius)
             {
-                Random r = new Random((int)DateTime.Now.Ticks);
+                Random r = context.Random;
                 int num = r.Next(SmellDistance + p.Radius);
                 if (num > vec.Length())
                     if (r.Next(5) == 1)
@@ -258,7 +256,7 @@ namespace AmoebaSim.Core.Organisms
             return ret;
         }
 
-        public int InteractsWithOrganism(Amoeba o)
+        internal int InteractsWithOrganism(Amoeba o, AmoebaSimContext context)
         {
             Vector2 vec = new Vector2(x - o.X, y - o.Y);
 
@@ -267,7 +265,7 @@ namespace AmoebaSim.Core.Organisms
             if (vec.Length() > ViewDistance + o.R
                 && vec.Length() <= SmellDistance + o.SmellDistance)
             {
-                Random r = new Random((int)DateTime.Now.Ticks);
+                Random r = context.Random;
                 int num = r.Next(SmellDistance + o.SmellDistance);
                 if (num > vec.Length())
                     if (r.Next(5) == 1)
@@ -284,30 +282,30 @@ namespace AmoebaSim.Core.Organisms
             return ret;
         }
 
-        public List<Amoeba> Reproduce()
+        internal List<Amoeba> Reproduce(AmoebaSimContext context)
         {
             List<Amoeba> children = new List<Amoeba>();
             for (int i = 0; i < NumberOfOffspring; i++)
             {
                 Amoeba o = new Amoeba(this);
-                o.genome.MutateAll(MUTATION_PROBABILITY);
+                o.genome.MutateAll(context.Config.MutationProbability, context.Random);
                 children.Add(o);
             }
 
             return children;
         }
 
-        public List<Amoeba> Reproduce(Amoeba o)
+        internal List<Amoeba> Reproduce(Amoeba o, AmoebaSimContext context)
         {
-            Genome<IntegerGene> newGenome = genome.Crossover(o.genome);
+            Genome<IntegerGene> newGenome = genome.Crossover(o.genome, context.Random);
             List<Amoeba> children = new List<Amoeba>();
             int numOffspring = (int)newGenome.Genes[(int)Attributes.NUMOFFSPRING].Value;
 
             for (int i = 0; i < numOffspring; i++)
             {
                 Amoeba norg = new Amoeba(this);
-                norg.genome = genome.Crossover(o.genome);
-                norg.genome.MutateAll(MUTATION_PROBABILITY);
+                norg.genome = genome.Crossover(o.genome, context.Random);
+                norg.genome.MutateAll(context.Config.MutationProbability, context.Random);
                 children.Add(norg);
             }
 

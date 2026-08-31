@@ -43,18 +43,15 @@ namespace AmoebaSim.Core.Genetics
             }
         }
 
-        public void MutateAll(int probabilityOfMutation) // Read as 1 in probabilityOfMutation
+        public void MutateAll(int probabilityOfMutation, Random r) // Read as 1 in probabilityOfMutation
         {
-            Random r = new Random((int)DateTime.UtcNow.Ticks);
-
             foreach (T g in genes)
                 if (r.Next(probabilityOfMutation) == r.Next(probabilityOfMutation))
-                    g.Mutate();
+                    g.Mutate(r);
         }
 
-        public Genome<T> Crossover(Genome<T> genome)
+        public Genome<T> Crossover(Genome<T> genome, Random r)
         {
-            Random r = new Random((int)DateTime.Now.Ticks);
             Genome<T> newGenome = new Genome<T>(this);
             for(int i = 0; i < newGenome.genes.Count; i++)
             {

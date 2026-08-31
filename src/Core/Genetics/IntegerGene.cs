@@ -49,9 +49,8 @@ namespace AmoebaSim.Core.Genetics
             set { val = (int)value; }
         }
 
-        public void Mutate()
+        public void Mutate(Random r)
         {
-            Random r = new Random((int)DateTime.UtcNow.Ticks);
             int b = r.Next(2);
 
             if (b != 0)
