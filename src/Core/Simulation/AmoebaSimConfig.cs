@@ -48,6 +48,8 @@ namespace AmoebaSim.Core.Simulation
             if (AmoebaLifeSpan <= TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(
                     nameof(AmoebaLifeSpan));
+
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(MutationProbability);
         }
     }
 }

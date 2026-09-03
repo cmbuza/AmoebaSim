@@ -44,22 +44,23 @@ namespace AmoebaSim.Core.Simulation
 
             Tick = 0;
             _plantGrowAccumulator = 0.0;
+            _advanceAccumulator = TimeSpan.Zero;
 
             for (int i = 0; i < Config.InitialAmoebaCount; i++)
             {
                 _amoebas.Add(
                     new Amoeba(
-                        Random.Shared.Next(Config.WorldWidth),
-                        Random.Shared.Next(Config.WorldHeight),
-                        Random.Shared.Next(10, 50),
+                        _context.Random.Next(Config.WorldWidth),
+                        _context.Random.Next(Config.WorldHeight),
+                        _context.Random.Next(10, 50),
                         1,
-                        Random.Shared.Next(20, 100),
-                        Random.Shared.Next(1, 5),
-                        Random.Shared.Next(2, 7),
-                        Random.Shared.Next(30, 100)));
+                        _context.Random.Next(20, 100),
+                        _context.Random.Next(1, 5),
+                        _context.Random.Next(2, 7),
+                        _context.Random.Next(30, 100)));
             }
 
-            Grow(Config.PlantsPerGrowth);
+            Grow(Config.InitialPlantCount);
         }
 
         private TimeSpan _advanceAccumulator = TimeSpan.Zero;
