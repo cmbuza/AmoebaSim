@@ -33,6 +33,7 @@ namespace AmoebaSim.Core.Organisms
         private Point targ;
         private Point loc;
         private bool bAlive;
+        private EntityId _id;
 
         //private Timer lifeTimer, switchDirTimer;
 
@@ -112,7 +113,7 @@ namespace AmoebaSim.Core.Organisms
 
         #region ISpatialEntity
 
-        public EntityId Id => throw new NotImplementedException();
+        public EntityId Id => _id;
 
         public Point Position => loc;
 
@@ -121,8 +122,9 @@ namespace AmoebaSim.Core.Organisms
         public SpatialEntityKind Kind => SpatialEntityKind.Amoeba;
 
         #endregion
-        public Amoeba()
+        public Amoeba(EntityId id)
         {
+            _id = id;
             genome = new Genome<IntegerGene>(Enum.GetNames(typeof(Attributes)).Length);
 
             #region gene parameters
@@ -165,15 +167,15 @@ namespace AmoebaSim.Core.Organisms
             bAlive = true;
         }
 
-        public Amoeba(int xVal, int yVal, int radius)
-            : this()
+        public Amoeba(EntityId id, int xVal, int yVal, int radius)
+            : this(id)
         {
             loc = new Point(xVal, yVal);
             R = radius;
         }
 
-        public Amoeba(int xVal, int yVal, int radius, int speed, int viewDist, int numOffspring, int foodToReproduce, int smellDist)
-            : this(xVal, yVal, radius)
+        public Amoeba(EntityId id, int xVal, int yVal, int radius, int speed, int viewDist, int numOffspring, int foodToReproduce, int smellDist)
+            : this(id, xVal, yVal, radius)
         {
             Speed = speed;
             ViewDistance = viewDist;
@@ -182,8 +184,8 @@ namespace AmoebaSim.Core.Organisms
             SmellDistance = smellDist;
         }
 
-        public Amoeba(Amoeba o)
-            : this()
+        public Amoeba(EntityId id, Amoeba o)
+            : this(id)
         {
             genome = new Genome<IntegerGene>(o.genome);
             loc = new Point(o.X, o.Y);
@@ -288,7 +290,7 @@ namespace AmoebaSim.Core.Organisms
             List<Amoeba> children = new List<Amoeba>();
             for (int i = 0; i < NumberOfOffspring; i++)
             {
-                Amoeba o = new Amoeba(this);
+                Amoeba o = new Amoeba(context.NextEntityId(),this);
                 o.genome.MutateAll(context.Config.MutationProbability, context.Random);
                 children.Add(o);
             }
@@ -304,7 +306,7 @@ namespace AmoebaSim.Core.Organisms
 
             for (int i = 0; i < numOffspring; i++)
             {
-                Amoeba norg = new Amoeba(this);
+                Amoeba norg = new Amoeba(context.NextEntityId(), this);
                 norg.genome = genome.Crossover(o.genome, context.Random);
                 norg.genome.MutateAll(context.Config.MutationProbability, context.Random);
                 children.Add(norg);

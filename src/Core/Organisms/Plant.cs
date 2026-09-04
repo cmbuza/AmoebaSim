@@ -8,6 +8,8 @@ namespace AmoebaSim.Core.Organisms
 {
     public sealed class Plant : ISpatialEntity
     {
+        private EntityId _id;
+
         public static bool IsEaten(Plant p)
         {
             return p.Eaten;
@@ -29,7 +31,7 @@ namespace AmoebaSim.Core.Organisms
 
         #region ISpatialEntity
 
-        public EntityId Id => throw new NotImplementedException();
+        public EntityId Id => _id;
 
         public Point Position => Location;
 
@@ -45,8 +47,9 @@ namespace AmoebaSim.Core.Organisms
 
         #endregion
 
-        public Plant(int x, int y, int rad)
+        public Plant(EntityId id, int x, int y, int rad)
         {
+            _id = id;
             loc = new Point(x, y);
 
             size = rad;
@@ -54,9 +57,9 @@ namespace AmoebaSim.Core.Organisms
             isEaten = false;
         }
 
-        public Plant() : this(0, 0, DEFAULT_RADIUS) {}
+        public Plant(EntityId id) : this(id, 0, 0, DEFAULT_RADIUS) {}
 
-        public Plant(int x, int y) : this(x, y, DEFAULT_RADIUS) {}
+        public Plant(EntityId id, int x, int y) : this(id, x, y, DEFAULT_RADIUS) {}
 
     }
 }

@@ -50,6 +50,7 @@ namespace AmoebaSim.Core.Simulation
             {
                 _amoebas.Add(
                     new Amoeba(
+                        _context.NextEntityId(),
                         _context.Random.Next(Config.WorldWidth),
                         _context.Random.Next(Config.WorldHeight),
                         _context.Random.Next(10, 50),
@@ -161,6 +162,7 @@ namespace AmoebaSim.Core.Simulation
         {
             for (int i = 0; i < numToGrow; i++)
                 _plants.Add(new Plant(
+                        _context.NextEntityId(),
                         _context.Random.Next(_context.WorldWidth),
                         _context.Random.Next(_context.WorldHeight),
                         _context.Random.Next(5, 30)

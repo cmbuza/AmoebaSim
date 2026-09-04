@@ -13,7 +13,7 @@ namespace AmoebaSim.Core.Simulation
         public int InitialPlantCount { get; init; } = 25;
 
         public TimeSpan AmoebaLifeSpan { get; init; }
-            = TimeSpan.FromSeconds(60);
+            = TimeSpan.FromSeconds(90);
 
         public int PlantsPerGrowth { get; init; } = 25;
         public TimeSpan PlantGrowthInterval { get; init; }

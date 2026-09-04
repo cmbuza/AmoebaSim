@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AmoebaSim.Core.Organisms;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +14,13 @@ namespace AmoebaSim.Core.Simulation
             Random = config.RandomSeed is int seed
                 ? new Random(seed)
                 : new Random();
+        }
+
+        private readonly EntityIdGenerator _ids = new();
+
+        internal EntityId NextEntityId()
+        {
+            return _ids.Next();
         }
 
         internal AmoebaSimConfig Config { get; }
