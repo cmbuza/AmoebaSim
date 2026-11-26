@@ -1,4 +1,4 @@
-﻿using AmoebaSim.Core.Organisms;
+﻿using AmoebaSim.Core.Spatial;
 using System;
 using System.Collections.Generic;
 using System.Text;

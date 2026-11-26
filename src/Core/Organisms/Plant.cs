@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AmoebaSim.Core.Primitives;
+using AmoebaSim.Core.Spatial;
 
 namespace AmoebaSim.Core.Organisms
 {
@@ -44,6 +45,8 @@ namespace AmoebaSim.Core.Organisms
         }
 
         public SpatialEntityKind Kind => SpatialEntityKind.Plant;
+
+        public SpatialBounds Bounds => SpatialBounds.Around(Position, Radius);
 
         #endregion
 

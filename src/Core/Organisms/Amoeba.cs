@@ -7,6 +7,7 @@ using System.Numerics;
 using AmoebaSim.Core.Genetics;
 using AmoebaSim.Core.Primitives;
 using AmoebaSim.Core.Simulation;
+using AmoebaSim.Core.Spatial;
 
 namespace AmoebaSim.Core.Organisms
 {
@@ -118,6 +119,8 @@ namespace AmoebaSim.Core.Organisms
         public Point Position => loc;
 
         public int Radius => R;
+
+        public SpatialBounds Bounds => SpatialBounds.Around(Position, Radius);
 
         public SpatialEntityKind Kind => SpatialEntityKind.Amoeba;
 

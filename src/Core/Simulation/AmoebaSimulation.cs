@@ -1,4 +1,5 @@
 ﻿using AmoebaSim.Core.Organisms;
+using AmoebaSim.Core.Spatial;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -25,6 +26,9 @@ namespace AmoebaSim.Core.Simulation
 
         public bool IsExtinct => _amoebas.Count == 0;
 
+        SpatialHash<ISpatialEntity> _spatialIndex;
+
+
         public AmoebaSimulation(AmoebaSimConfig config)
         {
             ArgumentNullException.ThrowIfNull(config);
@@ -33,6 +37,7 @@ namespace AmoebaSim.Core.Simulation
 
             Config = config;
             _context = new AmoebaSimContext(config);
+            _spatialIndex = new SpatialHash<ISpatialEntity>(Config.SpatialCellSize);
 
             Reset();
         }
@@ -41,6 +46,7 @@ namespace AmoebaSim.Core.Simulation
         {
             _amoebas.Clear();
             _plants.Clear();
+            _spatialIndex.Clear();
 
             Tick = 0;
             _plantGrowAccumulator = 0.0;

@@ -9,6 +9,8 @@ namespace AmoebaSim.Core.Simulation
         public int WorldWidth { get; init; } = 1200;
         public int WorldHeight { get; init; } = 900;
 
+        public int SpatialCellSize { get; init; } = 100;
+
         public int InitialAmoebaCount { get; init; } = 3;
         public int InitialPlantCount { get; init; } = 25;
 
@@ -33,6 +35,7 @@ namespace AmoebaSim.Core.Simulation
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(WorldWidth);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(WorldHeight);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(SpatialCellSize);
             ArgumentOutOfRangeException.ThrowIfNegative(InitialAmoebaCount);
             ArgumentOutOfRangeException.ThrowIfNegative(InitialPlantCount);
             ArgumentOutOfRangeException.ThrowIfNegative(PlantsPerGrowth);
